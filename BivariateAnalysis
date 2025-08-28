@@ -1,1 +1,70 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from scipy.stats import pearsonr, skew, kurtosis
+import numpy as np
 
+# Load the Excel file
+file_path = 'Data.xlsx'
+data = pd.read_excel(file_path)
+data
+
+# Normalize the data (min-max normalization)
+normalized_data = (data - data.min()) / (data.max() - data.min())
+
+# Function to calculate correlation coefficient and p-value with circle and color
+def corrfunc(x, y, **kws):
+    r, p = pearsonr(x, y)
+    size = abs(r) * 5200  # Increase size of the circle based on correlation
+    ax = plt.gca()
+    color = 'red' if r > 0 else 'blue'
+    ax.scatter(0.5, 0.5, s=size, alpha=0.6, c=color)
+    if p < 0.001:
+        ax.annotate(f'$r$ = {r:.3f}\n$p$ < 0.001', 
+                    xy=(0.5, 0.2), xycoords='axes fraction',  # Move text to lower part of the frame
+                    ha='center', va='center', fontsize=22, family='Times New Roman', style='italic', textcoords='offset points')
+    else:
+        ax.annotate(f'$r$ = {r:.3f}\n$p$ = {p:.3f}', 
+                    xy=(0.5, 0.2), xycoords='axes fraction',  # Move text to lower part of the frame
+                    ha='center', va='center', fontsize=22, family='Times New Roman', style='italic')
+
+# Beautify diagonal: KDE plot with shading and display skewness/kurtosis
+def diagfunc(x, **kws):
+    skewness = skew(x)
+    kurt = kurtosis(x)
+    sns.kdeplot(x, fill=True, color="mediumpurple", alpha=0.8)
+    ax = plt.gca()
+    ax.annotate(f'Skew: {skewness:.2f}\nKurt: {kurt:.2f}',
+                xy=(0.95, 0.95), xycoords='axes fraction',
+                ha='right', va='top', fontsize=20, family='Times New Roman', color='black')
+
+# Set font for plots
+plt.rcParams["font.family"] = "Times New Roman"
+plt.rcParams["font.size"] = 24  # Increase overall font size for plot titles
+
+# Create a PairGrid
+g = sns.PairGrid(normalized_data, diag_sharey=False)
+# Apply beautified diagonal
+g.map_diag(diagfunc)
+# Lower triangle: point density with hexbin (low density areas are white)
+def hexbin_density(x, y, **kws):
+    cmap = plt.cm.plasma  # Change density color map to 'plasma'
+    cmap.set_under(color='white')  # Set low-density areas to white
+    plt.hexbin(x, y, gridsize=35, cmap=cmap, extent=(0, 1, 0, 1), mincnt=1, edgecolors='none')
+g.map_lower(hexbin_density)
+# Upper triangle: correlation coefficient with circles
+g.map_upper(corrfunc)
+
+# Adjust axis limits to [0, 1] and add all axes for each plot
+for ax in g.axes.flatten():
+    if ax is not None:
+        ax.set_xlim(0, 1)
+        ax.set_ylim(0, 1)
+        ax.spines['top'].set_visible(True)
+        ax.spines['right'].set_visible(True)
+        ax.spines['bottom'].set_visible(True)
+        ax.spines['left'].set_visible(True)
+        ax.set_xticks([0, 1])  # Show only 0 and 1 on x-axis
+        ax.set_yticks([0, 1])  # Show only 0 and 1 on y-axis
+        ax.set_xticklabels(['0', '1'], fontsize=16)
+        ax.set_yticklabels(['0', '1'], fontsize=16)
