@@ -1,6 +1,7 @@
 Deciphering Land Use–Carbon Emissions–Economy Nexus: Decoupling Dynamics and Sustainable Planning Pathways
 
 This repository contains the original codes used in the study Deciphering Land Use–Carbon Emissions–Economy Nexus: Decoupling Dynamics and Sustainable Planning Pathways. The project integrates land use, socioeconomic, and meteorological data to construct regression-based models, optimize them, and interpret the results for sustainable planning research.
+https://www.cell.com/nexus/fulltext/S2950-1601(25)00035-X
 
 📂 Code Overview
 
