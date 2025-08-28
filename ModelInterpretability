@@ -1,0 +1,76 @@
+import pandas as pd
+import numpy as np
+from sklearn.ensemble import ExtraTreesRegressor
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import r2_score
+from sklearn.linear_model import LinearRegression
+import shap
+import matplotlib.pyplot as plt
+
+file_path = 'Data.xlsx'
+sheet_name = 'T1'
+data = pd.read_excel(file_path, sheet_name=sheet_name)
+
+X = data.iloc[:, :-1]  
+y = data.iloc[:, -1]   
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=LU-CE/LU-GDP)
+
+best_params = {'max_depth': BEST, 'max_features': BEST, 'min_samples_leaf': BEST,
+               'min_samples_split': BEST, 'n_estimators': BEST}
+
+model = ExtraTreesRegressor(**best_params, random_state=BEST)
+model.fit(X_train, y_train)
+
+y_pred_train = model.predict(X_train)
+y_pred_test = model.predict(X_test)
+train_r2 = r2_score(y_train, y_pred_train)
+test_r2 = r2_score(y_test, y_pred_test)
+print(f"Test R2: {train_r2}")
+print(f"Train R2: {test_r2}")
+
+results_df = pd.DataFrame({
+    'Actual': y_test,
+    'Predicted': y_pred_test
+})
+results_df.to_excel('Test1_Prediction_Results.xlsx', index=False)
+
+results_df = pd.DataFrame({
+    'Actual': y_train,
+    'Predicted': y_pred_train
+})
+results_df.to_excel('Train1_Prediction_Results.xlsx', index=False)
+
+plt.figure(figsize=(8, 6))
+plt.scatter(y_test, y_pred_test, color='blue', label='Predicted vs Actual')
+plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], color='red', linestyle='--', label='Ideal Fit')
+plt.xlabel('Actual Carbon Emissions')
+plt.ylabel('Predicted Carbon Emissions')
+plt.legend()
+plt.title('Predicted vs Actual Carbon Emissions (Test Set)')
+plt.savefig('Test1_Prediction_vs_Actual.png')
+plt.show()
+
+explainer = shap.TreeExplainer(model)
+shap_values = explainer.shap_values(X)
+
+shap_with_features = pd.DataFrame(shap_values, columns=[f"{col}_SHAP" for col in X.columns])
+shap_with_features = pd.concat([X.reset_index(drop=True), shap_with_features], axis=1)
+shap_with_features.to_excel("SHAPvALUE.xlsx", index=False)
+
+mean_abs_shap = shap_with_features[[f"{col}_SHAP" for col in X.columns]].abs().mean()
+feature_importance = mean_abs_shap.sort_values(ascending=False).reset_index()
+feature_importance.columns = ["f", "absShapley"]
+feature_importance.to_excel("Contribution.xlsx", index=False)
+
+new_sample_path = "PreData.xlsx"  
+new__sheet_name = 'T2'
+new_sample = pd.read_excel(new_sample_path, sheet_name=new__sheet_name)
+X_new = new_sample.iloc[:, :11]
+X_new
+
+y_pred_new = model.predict(X_new)
+
+# 将预测结果保存到 Excel 文件
+prediction_df = pd.DataFrame({"PreCE/GDP": y_pred_new})
+prediction_df.to_excel("PreCE/GDP.xlsx", index=False)
