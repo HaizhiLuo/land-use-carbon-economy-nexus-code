@@ -1,0 +1,133 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split, RandomizedSearchCV
+from sklearn.ensemble import ExtraTreesRegressor
+from sklearn.metrics import r2_score
+import numpy as np
+from skopt.space import Real, Integer, Categorical
+from skopt import BayesSearchCV
+import itertools
+from sklearn.model_selection import GridSearchCV, train_test_split
+
+# For Land Use-Carbon Emissions
+
+file_path = "Data.xlsx"
+data = pd.read_excel(file_path, sheet_name="T1")
+data
+
+X = data.iloc[:, :11]  
+y = data.iloc[:, -1]   
+
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=160)
+
+param_grid = {
+    'n_estimators': [50, 100, 200, 300],
+    'max_depth': [10, 20, 30, 40, 50],
+    'max_features': ['auto', 'sqrt', 'log2'],
+    'min_samples_split': [2, 5, 10]
+}
+
+grid_search = GridSearchCV(
+    ExtraTreesRegressor(random_state=best_random_state),
+    param_grid,
+    scoring='r2',
+    cv=5,
+    n_jobs=-1
+)
+grid_search.fit(X_train, y_train)
+
+best_params_grid = grid_search.best_params_
+best_score_grid = grid_search.best_score_
+
+best_model_grid = grid_search.best_estimator_
+train_r2_grid = r2_score(y_train, best_model_grid.predict(X_train))
+test_r2_grid = r2_score(y_test, best_model_grid.predict(X_test))
+
+print(best_params_grid)
+print(train_r2_grid)
+print(test_r2_grid)
+
+bayes_search = BayesSearchCV(
+    ExtraTreesRegressor(random_state=95),
+    {
+        'n_estimators': Integer(50, 500),
+        'max_depth': Integer(1, 50),
+        'max_features': Categorical(['sqrt', 'log2', None]),  
+        'min_samples_split': Integer(2, 80),
+        'min_samples_leaf': Integer(1, 80)
+    },
+    n_iter=100  
+)
+
+bayes_search.fit(X_train, y_train)
+
+best_params_bayes = bayes_search.best_params_
+best_score_bayes = bayes_search.best_score_
+
+best_model_bayes = bayes_search.best_estimator_
+train_r2_bayes = r2_score(y_train, best_model_bayes.predict(X_train))
+test_r2_bayes = r2_score(y_test, best_model_bayes.predict(X_test))
+
+print(best_params_bayes)
+print(train_r2_bayes)
+print(test_r2_bayes)
+
+
+# For Land Use-GDP
+file_path = "Data.xlsx"
+data = pd.read_excel(file_path, sheet_name="T1")
+data
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=5)
+
+param_grid = {
+    'n_estimators': [50, 100, 200, 300],
+    'max_depth': [10, 20, 30, 40, 50],
+    'max_features': ['auto', 'sqrt', 'log2'],
+    'min_samples_split': [2, 5, 10]
+}
+
+grid_search = GridSearchCV(
+    ExtraTreesRegressor(random_state=best_random_state),
+    param_grid,
+    scoring='r2',
+    cv=5,
+    n_jobs=-1
+)
+grid_search.fit(X_train, y_train)
+
+best_params_grid = grid_search.best_params_
+best_score_grid = grid_search.best_score_
+
+best_model_grid = grid_search.best_estimator_
+train_r2_grid = r2_score(y_train, best_model_grid.predict(X_train))
+test_r2_grid = r2_score(y_test, best_model_grid.predict(X_test))
+
+print(best_params_grid)
+print(train_r2_grid)
+print( test_r2_grid)
+
+bayes_search = BayesSearchCV(
+    ExtraTreesRegressor(random_state=95),
+    {
+        'n_estimators': Integer(50, 500),
+        'max_depth': Integer(1, 50),
+        'max_features': Categorical(['sqrt', 'log2', None]), 
+        'min_samples_split': Integer(2, 80),
+        'min_samples_leaf': Integer(1, 80)
+    },
+    n_iter=100 
+)
+
+bayes_search.fit(X_train, y_train)
+
+best_params_bayes = bayes_search.best_params_
+best_score_bayes = bayes_search.best_score_
+
+best_model_bayes = bayes_search.best_estimator_
+train_r2_bayes = r2_score(y_train, best_model_bayes.predict(X_train))
+test_r2_bayes = r2_score(y_test, best_model_bayes.predict(X_test))
+
+print(best_params_bayes)
+print(train_r2_bayes)
+print(test_r2_bayes)
