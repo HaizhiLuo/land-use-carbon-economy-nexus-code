@@ -1,1 +1,119 @@
-This part of the code is used to screen the base models required for regression.
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression, Ridge, Lasso, ElasticNet
+from sklearn.tree import DecisionTreeRegressor, ExtraTreeRegressor
+from sklearn.ensemble import RandomForestRegressor, ExtraTreesRegressor, GradientBoostingRegressor, AdaBoostRegressor
+from sklearn.svm import SVR
+from sklearn.neural_network import MLPRegressor
+from xgboost import XGBRegressor
+from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
+
+
+# For Land use-Carbon Emissions
+
+file_path = "Data.xlsx"
+data = pd.read_excel(file_path, sheet_name="T1")
+data
+
+X = data.iloc[:, :11]  
+y = data.iloc[:, -1]   
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=42)
+
+models = {
+    "Linear Regression": LinearRegression(),
+    "Ridge Regression": Ridge(),
+    "Lasso Regression": Lasso(),
+    "Elastic Net": ElasticNet(),
+    "Decision Tree": DecisionTreeRegressor(random_state=42),
+    "Extra Tree": ExtraTreeRegressor(random_state=42),
+    "Random Forest": RandomForestRegressor(random_state=42),
+    "Extra Trees": ExtraTreesRegressor(random_state=42),
+    "Gradient Boosting": GradientBoostingRegressor(random_state=42),
+    "AdaBoost": AdaBoostRegressor(random_state=42),
+    "Support Vector Regressor": SVR(),
+    "MLP Regressor": MLPRegressor(max_iter=500, random_state=42),
+    "XGBoost": XGBRegressor(objective='reg:squarederror', random_state=42),
+}
+
+results = {}
+
+for model_name, model in models.items():
+    model.fit(X_train, y_train)  # 训练模型
+    y_train_pred = model.predict(X_train)
+    y_test_pred = model.predict(X_test)
+    
+    train_r2 = r2_score(y_train, y_train_pred)
+    test_r2 = r2_score(y_test, y_test_pred)
+    
+    train_mse = mean_squared_error(y_train, y_train_pred)
+    test_mse = mean_squared_error(y_test, y_test_pred)
+    
+    results[model_name] = {
+        "Train R2": train_r2,
+        "Test R2": test_r2,
+        "Train MSE": train_mse,
+        "Test MSE": test_mse
+    }
+
+
+results_df = pd.DataFrame(results).T  
+results_df.reset_index(inplace=True)
+results_df.rename(columns={"index": "Model"}, inplace=True)
+
+output_path = "Model_Results_R2MSE.xlsx"
+results_df.to_excel(output_path, index=False)
+
+# For Land use-GDP
+
+file_path = "Data.xlsx"
+data = pd.read_excel(file_path, sheet_name="T1")
+data
+
+X = data.iloc[:, :11]  
+y = data.iloc[:, -1]   
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=5)
+
+models = {
+    "Linear Regression": LinearRegression(),
+    "Ridge Regression": Ridge(),
+    "Lasso Regression": Lasso(),
+    "Elastic Net": ElasticNet(),
+    "Decision Tree": DecisionTreeRegressor(random_state=42),
+    "Extra Tree": ExtraTreeRegressor(random_state=42),
+    "Random Forest": RandomForestRegressor(random_state=42),
+    "Extra Trees": ExtraTreesRegressor(random_state=42),
+    "Gradient Boosting": GradientBoostingRegressor(random_state=42),
+    "AdaBoost": AdaBoostRegressor(random_state=42),
+    "Support Vector Regressor": SVR(),
+    "MLP Regressor": MLPRegressor(max_iter=500, random_state=42),
+    "XGBoost": XGBRegressor(objective='reg:squarederror', random_state=42),
+}
+
+results = {}
+
+for model_name, model in models.items():
+    model.fit(X_train, y_train)  # 训练模型
+    y_train_pred = model.predict(X_train)
+    y_test_pred = model.predict(X_test)
+    
+    train_r2 = r2_score(y_train, y_train_pred)
+    test_r2 = r2_score(y_test, y_test_pred)
+    
+    train_mse = mean_squared_error(y_train, y_train_pred)
+    test_mse = mean_squared_error(y_test, y_test_pred)
+    
+    results[model_name] = {
+        "Train R2": train_r2,
+        "Test R2": test_r2,
+        "Train MSE": train_mse,
+        "Test MSE": test_mse
+    }
+
+results_df = pd.DataFrame(results).T  
+results_df.reset_index(inplace=True)
+results_df.rename(columns={"index": "Model"}, inplace=True)
+
+output_path = "Model_Results_R2MSE.xlsx"
+results_df.to_excel(output_path, index=False)
+
