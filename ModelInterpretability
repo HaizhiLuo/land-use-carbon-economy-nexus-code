@@ -14,7 +14,7 @@ data = pd.read_excel(file_path, sheet_name=sheet_name)
 X = data.iloc[:, :-1]  
 y = data.iloc[:, -1]   
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=LU-CE/LU-GDP)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=LU-CE/LU-GDP)
 
 best_params = {'max_depth': BEST, 'max_features': BEST, 'min_samples_leaf': BEST,
                'min_samples_split': BEST, 'n_estimators': BEST}
@@ -71,6 +71,6 @@ X_new
 
 y_pred_new = model.predict(X_new)
 
-# 将预测结果保存到 Excel 文件
+# Output Result
 prediction_df = pd.DataFrame({"PreCE/GDP": y_pred_new})
 prediction_df.to_excel("PreCE/GDP.xlsx", index=False)
