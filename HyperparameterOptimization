@@ -18,7 +18,7 @@ X = data.iloc[:, :11]
 y = data.iloc[:, -1]   
 
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=160)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 param_grid = {
     'n_estimators': [50, 100, 200, 300],
@@ -131,3 +131,5 @@ test_r2_bayes = r2_score(y_test, best_model_bayes.predict(X_test))
 print(best_params_bayes)
 print(train_r2_bayes)
 print(test_r2_bayes)
+
+
